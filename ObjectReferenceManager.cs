@@ -1,9 +1,4 @@
-﻿using Il2CppMegagon.Downhill.UI;
-using Il2CppMegagon.Downhill.UI.Animations;
-using Il2CppMegagon.Downhill.UI.Screens;
-using Il2CppMegagon.Downhill.UI.Screens.Helper;
-using Il2CppTMPro;
-using LMUI.Core;
+﻿using LMUI.Core;
 using MelonLoader;
 using UnityEngine;
 
