@@ -11,8 +11,8 @@ namespace LMUI;
 
 public class ObjectReferenceManager
 {
-    private Logger _logger;
-	public ObjectReferenceManager(Logger logger)
+    readonly Logger _logger;
+	internal ObjectReferenceManager(Logger logger)
 	{
 		_logger = logger;
 	}
@@ -42,7 +42,7 @@ public class ObjectReferenceManager
 		return GameObject.Find(referencePath);
 	}
 
-	public void AssignGameObjects()
+	private void AssignGameObjects()
 	{
 		_mainMenuScreen = FindGameObjectReference(MAIN_MENU_SCREEN_PATH);
 		_pauseScreen = FindGameObjectReference(PAUSE_SCREEN_PATH);
@@ -54,11 +54,42 @@ public class ObjectReferenceManager
 
 	}
 
-	// Set properties
+	// Clear function for use on scene load
+	public void RefreshReferences()
+	{
+		AssignGameObjects();
+	}
 
+	// Set properties
 	public GameObject MainMenuScreen
     {
         get => _mainMenuScreen;
         private set => _mainMenuScreen = value;
     }
+	public GameObject PauseScreen
+	{
+		get => _pauseScreen;
+		private set => _pauseScreen = value;
+	}
+    public GameObject SettingsScreen
+    {
+        get => _settingsScreen;
+        private set => _settingsScreen = value;
+    }
+
+	public GameObject MainMenuScreenLayout
+	{
+		get => _mainMenuScreenLayout;
+		private set => _mainMenuScreenLayout = value;
+	}
+	public GameObject PauseScreenLayout
+	{
+		get => _pauseScreenLayout;
+		private set => _pauseScreenLayout = value;
+	}
+	public GameObject SettingsScreenLayout
+	{
+		get => _settingsScreenLayout;
+		private set => _settingsScreenLayout = value;
+	}
 }

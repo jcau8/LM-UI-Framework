@@ -31,7 +31,7 @@ namespace LMUI
 			{
 				LoggerInstance.Msg($"Scene {sceneName} with build index {buildIndex} has been loaded!");
 				LoggerInstance.Msg("");
-				_objectRefManager.AssignGameObjects();
+				_objectRefManager.RefreshReferences();
 				_mainMenuWasLoaded = true;
 			}
 		}
