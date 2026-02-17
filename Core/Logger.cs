@@ -1,7 +1,7 @@
 ﻿using MelonLoader;
 
 
-namespace LMDModMenu;
+namespace LMUI;
 
 /// <summary>
 /// Basic wrapper for the MelonLogger instance.

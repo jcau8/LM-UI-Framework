@@ -1,12 +1,10 @@
 ﻿using MelonLoader;
 using UnityEngine;
-using System.Collections;
-using static MelonLoader.MelonLaunchOptions;
 
-[assembly: MelonInfo(typeof(LMDModMenu.ModCore), "LMD UI Mod Menu", "1.0.0", "DevdudeX", null)]
+[assembly: MelonInfo(typeof(LMUI.ModCore), "LMD UI Framework", "1.0.0", "DevdudeX", null)]
 [assembly: MelonGame("Megagon Industries", "Lonely Mountains: Downhill")]
 
-namespace LMDModMenu
+namespace LMUI
 {
 	public class ModCore : MelonMod
 	{
@@ -32,50 +30,14 @@ namespace LMDModMenu
 			if (Array.IndexOf(whitelistedLoadScenes, sceneName) != -1)
 			{
 				LoggerInstance.Msg($"Scene {sceneName} with build index {buildIndex} has been loaded!");
+				LoggerInstance.Msg("");
+				_objectRefManager.AssignGameObjects();
 				_mainMenuWasLoaded = true;
 			}
-
-			//MelonCoroutines.Start(DelayedSceneLoad());
 		}
 
 		public override void OnUpdate()
 		{
-			if (!_mainMenuWasLoaded) return;
-
-			if (!_menuHasBeenSetUp)
-			{
-				TryToSetUpMenu();
-			}
-		}
-
-
-
-		void TryToSetUpMenu()
-		{
-			_loadTimer += Time.deltaTime;
-			if (_loadTimer > 10f)
-			{
-				_objectRefManager.FindMainMenuReferences();
-
-				if (!_objectRefManager.MenuIsActive)
-				{
-					_logger.LogInfo("Failed to set up menu. Delaying for 10s...");
-					_loadTimer = 0f;
-					return;
-				}
-
-				_logger.LogInfo("Updating main menu version label.");
-				_objectRefManager.SetModdedVersionLabel();
-
-				_logger.LogInfo("Generating 'Mods' menu button.");
-				_objectRefManager.GenerateModsButton();
-
-				_logger.LogInfo("Generating mod menu screen.");
-				_objectRefManager.CreateModMenuScreen();
-
-
-				_menuHasBeenSetUp = true;
-			}
 		}
 	}
 }

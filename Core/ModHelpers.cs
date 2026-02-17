@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace LMDModMenu.Core;
+namespace LMUI.Core;
 
 /// <summary>
 /// Contains useful helper methods.
