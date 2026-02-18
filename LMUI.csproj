@@ -3,13 +3,13 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>disable</Nullable>
-		<RootNamespace>LMDModMenu</RootNamespace>
+		<RootNamespace>LMUI</RootNamespace>
 		<LangVersion>default</LangVersion>
 		<IsPackable>false</IsPackable>
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
 		<FileVersion>1.0.0.0</FileVersion>
 		<NeutralLanguage>en-US</NeutralLanguage>
-		<AssemblyName>LMDModMenu</AssemblyName>
+		<AssemblyName>LMUI</AssemblyName>
 		<LangVersion>latest</LangVersion>
 		<CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
 	</PropertyGroup>
@@ -27,7 +27,9 @@
 	<ItemGroup>
 		<Compile Include="Core\Logger.cs" />
 		<Compile Include="Core\ModHelpers.cs" />
+		<Compile Include="FileHandler.cs" />
 		<Compile Include="ModCore.cs" />
+		<Compile Include="ObjectManager.cs" />
 		<Compile Include="ObjectReferenceManager.cs" />
 	</ItemGroup>
 
@@ -52,6 +54,9 @@
 	  </Reference>
 	  <Reference Include="UnityEngine">
 	    <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Lonely Mountains - Downhill\MelonLoader\Il2CppAssemblies\UnityEngine.dll</HintPath>
+	  </Reference>
+	  <Reference Include="UnityEngine.AssetBundleModule">
+	    <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Lonely Mountains - Downhill\MelonLoader\Il2CppAssemblies\UnityEngine.AssetBundleModule.dll</HintPath>
 	  </Reference>
 	  <Reference Include="UnityEngine.CoreModule">
 	    <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Lonely Mountains - Downhill\MelonLoader\Il2CppAssemblies\UnityEngine.CoreModule.dll</HintPath>

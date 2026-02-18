@@ -30,7 +30,7 @@ namespace LMUI
 			if (Array.IndexOf(whitelistedLoadScenes, sceneName) != -1)
 			{
 				LoggerInstance.Msg($"Scene {sceneName} with build index {buildIndex} has been loaded!");
-				LoggerInstance.Msg("");
+				LoggerInstance.Msg("Refreshing references...");
 				_objectRefManager.RefreshReferences();
 				_mainMenuWasLoaded = true;
 			}
