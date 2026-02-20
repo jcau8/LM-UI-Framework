@@ -154,6 +154,11 @@ namespace LMUI
                 // An error has occured so return without data
                 return null;
             }
+
+            internal static void Unload(AssetBundle loadedAssetBundle)
+            {
+                loadedAssetBundle.Unload(false);
+            }
         }
     }
 }

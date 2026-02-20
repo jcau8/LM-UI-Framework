@@ -31,6 +31,7 @@
 		<Compile Include="ModCore.cs" />
 		<Compile Include="ObjectManager.cs" />
 		<Compile Include="ObjectReferenceManager.cs" />
+		<Compile Include="OnHoverHandler.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

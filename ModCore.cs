@@ -11,6 +11,10 @@ namespace LMUI
 		public const string MOD_VERSION = "1.0.0";
 		private static Logger _logger;
 		private static ObjectReferenceManager _objectRefManager;
+		private static ObjectManager _objectManager;
+		private static FileHandler _fileHandler;
+		private static FileHandler.AssetBundleHandler _assetBundleHandler;
+		private static FileHandler.AssetBundlesFolder _assetBundlesFolder;
 
 		bool _mainMenuWasLoaded = false;
 		bool _menuHasBeenSetUp = false;
@@ -22,6 +26,11 @@ namespace LMUI
 			_logger.LogInfo("Initializing.");
 
 			_objectRefManager = new ObjectReferenceManager(_logger);
+			_objectManager = new ObjectManager(_logger);
+			_fileHandler = new FileHandler(_logger);
+			_assetBundleHandler = new FileHandler.AssetBundleHandler(_logger);
+			_assetBundlesFolder = new FileHandler.AssetBundlesFolder(_logger);
+			_logger.LogInfo("Successfully initialised scripts");
 		}
 
 		public override void OnSceneWasLoaded(int buildIndex, string sceneName)
