@@ -116,16 +116,7 @@ namespace LMUI
                 }
             }
 
-            internal void ApplyGameHoverFontColour(GameObject btnObj)
-            {
-                // Using GetComponentInChildren because the text is often a child of the button
-                TextMeshProUGUI _tmp = btnObj.GetComponentInChildren<TextMeshProUGUI>();
-
-                _tmp.color = _gameHoverColour;
-
-            }
-
-            internal void ApplyTextColourChangeOnHover(GameObject btnObj)
+            internal static void ApplyTextColourChangeOnHover(GameObject btnObj)
             {
 
             }
