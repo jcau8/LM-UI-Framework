@@ -82,7 +82,7 @@ namespace LMUI
 
             private readonly ObjectReferenceManager _objectReferenceManager;
             private GameObject _buttonObject;
-            private Color32 _gameHoverColour = new(145, 190, 15, 255);
+            private Action _onClickAction;
 
             public GameObject ButtonObject
             {
@@ -172,6 +172,37 @@ namespace LMUI
                     _logger.LogError($"{menuName} isn't a valid menu name. The valid names are: \"main\", \"pause\" and \"settings\"");
                     return null;
                 }
+            }
+
+            // Allows the user to decide what they want to do when the button is clicked
+            internal void SetOnClickAction(Action action)
+            {
+                if (action != null)
+                {
+                    _onClickAction = action;
+                }
+                else
+                {
+                    _logger.LogError($"Failed to assign {action} to _onClickAction because {action} is null");
+                }
+            }
+
+            internal void OnBtnClick()
+            {
+                try
+                {
+                    _onClickAction?.Invoke();
+                }
+                catch (Exception)
+                {
+                    _logger.LogError("Failed to run user-defined on click action");
+                    throw;
+                }
+            }
+
+            internal void AddOnClickListener(GameObject btnObj)
+            {
+                btnObj.GetComponent<UnityEngine.UI.Button>().onClick.AddListener((UnityEngine.Events.UnityAction)OnBtnClick);
             }
         }
     }
