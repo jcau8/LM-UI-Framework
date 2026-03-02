@@ -1,37 +1,42 @@
 ﻿using Il2CppTMPro;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
 namespace LMUI
 {
     internal class OnHoverHandler : MonoBehaviour
     {
-        private bool _pointerOver = false;
         private EventTrigger _trigger;
         private EventTrigger.Entry _pointerEnter;
         private EventTrigger.Entry _pointerExit;
         Color baseColour;
 
-        // Using a property so it can be accessed from all functions
+        // Using an external vairable so it can be accessed from all functions
         // Doing this due to an annoying IL2CPP and Unity thing
-        internal GameObject BtnObj { get; set; }
+        // Probably a better way to do this though
+        private GameObject _btnObj;
+
+        private void SetBtnObj()
+        {
+            _btnObj = gameObject;
+        }
 
         private void SetTrigger()
         {
             // See if the button object already has the event trigger component
             // If not then add it, if it does the get it
-            _trigger = BtnObj.GetComponent<EventTrigger>() ?? BtnObj.AddComponent<EventTrigger>();
+            _trigger = _btnObj.GetComponent<EventTrigger>() ?? _btnObj.AddComponent<EventTrigger>();
         }
 
         private TextMeshProUGUI GetTMP()
         {
-            return BtnObj.GetComponentInChildren<TextMeshProUGUI>();
+            return _btnObj.GetComponentInChildren<TextMeshProUGUI>();
         }
 
         internal void PointerEnterListener()
         {
             SetTrigger();
+            SetBtnObj();
             // Create a new entry of type PointerEnter
             _pointerEnter = new EventTrigger.Entry
             {
@@ -45,7 +50,6 @@ namespace LMUI
 
         internal void OnPointerEntered(BaseEventData data)
         {
-            _pointerOver = true;
             // Get the TMP object and save the original colour
             TextMeshProUGUI _TMP = GetTMP();
             baseColour = _TMP.color;
@@ -57,6 +61,7 @@ namespace LMUI
         internal void PointerExitListener()
         {
             SetTrigger();
+            SetBtnObj();
             // Create a new entry of type PointerEnter
             _pointerExit = new EventTrigger.Entry
             {
@@ -70,7 +75,6 @@ namespace LMUI
 
         internal void OnPointerExited(BaseEventData data)
         {
-            _pointerOver = false;
             // Get the TMP object and save the original colour
             TextMeshProUGUI _TMP = GetTMP();
             _TMP.color = baseColour;

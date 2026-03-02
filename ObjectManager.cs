@@ -1,7 +1,4 @@
-﻿using Il2CppMegagon.Downhill.Config;
-using Il2CppTMPro;
-using UnityEngine;
-using UnityEngine.EventSystems;
+﻿using UnityEngine;
 
 namespace LMUI
 {
@@ -116,15 +113,15 @@ namespace LMUI
                 }
             }
 
-            internal static void ApplyTextColourChangeOnHover(GameObject btnObj)
+            internal static void ApplyHoverHandler(GameObject btnObj)
             {
-
+                btnObj.AddComponent<OnHoverHandler>();
             }
 
             internal void ApplyGameMenuStyle(GameObject btnObj)
             {
                 StealGameButtonImage(btnObj);
-                ApplyTextColourChangeOnHover(btnObj);
+                ApplyHoverHandler(btnObj);
             }
 
             // Instantiate a button prefab into a game menu
