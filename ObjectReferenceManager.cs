@@ -27,22 +27,38 @@ public class ObjectReferenceManager
     internal static Color32 LMD_HOVER_TEXT_COLOUR = new(145, 190, 15, 255);
 
     // Set properties
-    public GameObject MainMenuScreen { get; private set; }
-    public GameObject PauseScreen { get; private set; }
-    public GameObject SettingsScreen { get; private set; }
+    public GameObject MainMenuScreen { get; internal set; }
+    public GameObject PauseScreen { get; internal set; }
+    public GameObject SettingsScreen { get; internal set; }
 
-    public GameObject MainMenuScreenLayout { get; private set; }
-    public GameObject PauseScreenLayout { get; private set; }
-    public GameObject SettingsScreenLayout { get; private set; }
+    public GameObject MainMenuScreenLayout { get; internal set; }
+    public GameObject PauseScreenLayout { get; internal set; }
+    public GameObject SettingsScreenLayout { get; internal set; }
 
-    public GameObject MainMenuOptionsButton { get; private set; }
+    public GameObject MainMenuOptionsButton { get; internal set; }
 
-    // Find the GameObject reference
-    public static GameObject FindGameObjectReference(string referencePath)
+    /// <summary>
+    /// Find the given GameObject reference
+    /// </summary>
+    /// <returns>
+    /// The GameObject found at that reference
+    /// </returns>
+    public GameObject FindGameObjectReference(string referencePath)
     {
-        return GameObject.Find(referencePath);
+        try
+        {
+            return GameObject.Find(referencePath);
+        }
+        catch (Exception)
+        {
+            _logger.LogError($"Failed to find a GameObject at {referencePath}");
+            throw;
+        }
     }
 
+    /// <summary>
+    /// Assigns GameObjects to the properites
+    /// </summary>
     private void AssignGameObjects()
     {
         MainMenuScreen = FindGameObjectReference(MAIN_MENU_SCREEN_PATH);
@@ -57,6 +73,9 @@ public class ObjectReferenceManager
     }
 
     // Clear function for use on scene load
+    /// <summary>
+    /// Assigns/reassigns GameObjects to the menu screen properties, intended to be used on scene load
+    /// </summary>
     public void RefreshReferences()
     {
         try

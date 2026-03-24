@@ -28,6 +28,7 @@
 		<Compile Include="Core\Logger.cs" />
 		<Compile Include="Core\ModHelpers.cs" />
 		<Compile Include="FileHandler.cs" />
+		<Compile Include="FunctionTest.cs" />
 		<Compile Include="ModCore.cs" />
 		<Compile Include="ObjectManager.cs" />
 		<Compile Include="ObjectReferenceManager.cs" />

@@ -155,9 +155,20 @@ namespace LMUI
                 return null;
             }
 
-            internal static void Unload(AssetBundle loadedAssetBundle)
+            /// <summary>
+            /// Collects all garbage then unloads the given bundle and all its loaded objects. For use OnDeinitializeMelon
+            /// </summary>
+            internal void Unload(AssetBundle loadedAssetBundle)
             {
-                loadedAssetBundle.Unload(false);
+                if (loadedAssetBundle != null)
+                {
+                    System.GC.Collect();
+                    loadedAssetBundle.Unload(true);
+                }
+                else
+                {
+                    _logger.LogInfo($"{loadedAssetBundle.name} is null");
+                }
             }
         }
     }
