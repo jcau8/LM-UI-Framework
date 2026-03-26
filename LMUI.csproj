@@ -25,14 +25,18 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Compile Include="Core\Logger.cs" />
-		<Compile Include="Core\ModHelpers.cs" />
-		<Compile Include="FileHandler.cs" />
-		<Compile Include="FunctionTest.cs" />
-		<Compile Include="ModCore.cs" />
-		<Compile Include="ObjectManager.cs" />
-		<Compile Include="ObjectReferenceManager.cs" />
-		<Compile Include="OnHoverHandler.cs" />
+		<Compile Include="Helpers\Logger.cs" />
+		<Compile Include="Helpers\ModHelpers.cs" />
+		<Compile Include="Core\FileHandler.cs" />
+		<Compile Include="Core\FunctionTest.cs" />
+		<Compile Include="CoreShell.cs" />
+		<Compile Include="Core\ObjectManager.cs" />
+		<Compile Include="Core\ObjectReferenceManager.cs" />
+		<Compile Include="Core\OnHoverHandler.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="Core\FunctionTest.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -1,7 +1,7 @@
 ﻿using Il2CppInterop.Runtime.Injection;
 using UnityEngine;
 
-namespace LMUI
+namespace LMUI.Core
 {
     internal class ObjectManager
     {
@@ -18,7 +18,7 @@ namespace LMUI
         /// <summary>
         /// Holds all possible menu screen types.
         /// </summary>
-        internal enum MenuScreen
+        internal enum InternalMenuScreen
         {
             MainMenu,
             PauseMenu,
@@ -65,19 +65,19 @@ namespace LMUI
         /// <returns>
         /// A boolean representing the state of the given menu.
         /// </returns>
-        internal bool TargetMenuActive(MenuScreen targetMenu)
+        internal bool TargetMenuActive(InternalMenuScreen targetMenu)
         {
             // Using the layouts instead of the actual screens due to the order of which they are added.
             // Once the layout is added we know that the actual menu exists.
             switch (targetMenu)
             {
-                case MenuScreen.MainMenu:
+                case InternalMenuScreen.MainMenu:
                     return _objectReferenceManager.MainMenuScreenLayout != null;
 
-                case MenuScreen.PauseMenu:
+                case InternalMenuScreen.PauseMenu:
                     return _objectReferenceManager.PauseScreenLayout != null;
 
-                case MenuScreen.SettingsMenu:
+                case InternalMenuScreen.SettingsMenu:
                     return _objectReferenceManager.SettingsScreenLayout != null;
 
                 default:
@@ -91,7 +91,7 @@ namespace LMUI
         /// <returns>
         /// The instantiated prefab as a GameObject
         /// </returns>
-        internal GameObject InstantiatePrefabIntoMenuScreen(GameObject prefab, MenuScreen targetMenu)
+        internal GameObject InstantiatePrefabIntoMenuScreen(GameObject prefab, InternalMenuScreen targetMenu)
         {
             // There is probably a better way to handle when the menu isn't active
             try
@@ -100,13 +100,13 @@ namespace LMUI
                 {
                     switch (targetMenu)
                     {
-                        case MenuScreen.MainMenu:
+                        case InternalMenuScreen.MainMenu:
                             return GameObject.Instantiate(prefab, _objectReferenceManager.MainMenuScreen.transform);
 
-                        case MenuScreen.PauseMenu:
+                        case InternalMenuScreen.PauseMenu:
                             return GameObject.Instantiate(prefab, _objectReferenceManager.PauseScreen.transform);
 
-                        case MenuScreen.SettingsMenu:
+                        case InternalMenuScreen.SettingsMenu:
                             return GameObject.Instantiate(prefab, _objectReferenceManager.SettingsScreen.transform);
 
                         default:
@@ -134,16 +134,16 @@ namespace LMUI
         {
             try
             {
-                List<GameObject> _children = [];
-                GameObject _parentObject = parentObject;
+                List<GameObject> children = [];
+                GameObject parent = parentObject;
 
-                foreach (Transform child in _parentObject.transform)
+                foreach (Transform child in parent.transform)
                 {
-                    _children.Add(child.gameObject);
+                    children.Add(child.gameObject);
                 }
-                _children.ForEach(child => GameObject.Destroy(child));
+                children.ForEach(child => GameObject.Destroy(child));
 
-                return _parentObject;
+                return parent;
             }
             catch (Exception)
             {
@@ -158,30 +158,30 @@ namespace LMUI
         /// <returns>
         /// A menu layout GameObject with children removed
         /// </returns>
-        internal GameObject DuplicateAndClearLayoutFromMenu(MenuScreen targetMenu, string newLayoutName)
+        internal GameObject DuplicateAndClearLayoutFromMenu(InternalMenuScreen targetMenu, string newLayoutName)
         {
             try
             {
-                GameObject _newLayout;
+                GameObject newLayout;
                 switch (targetMenu)
                 {
-                    case MenuScreen.MainMenu:
-                        _newLayout = GameObject.Instantiate(_objectReferenceManager.MainMenuScreenLayout, _objectReferenceManager.MainMenuScreenLayout.transform);
-                        _newLayout.name = newLayoutName;
-                        _newLayout = DeleteAllChildren(_newLayout);
-                        return _newLayout;
+                    case InternalMenuScreen.MainMenu:
+                        newLayout = GameObject.Instantiate(_objectReferenceManager.MainMenuScreenLayout, _objectReferenceManager.MainMenuScreenLayout.transform);
+                        newLayout.name = newLayoutName;
+                        newLayout = DeleteAllChildren(newLayout);
+                        return newLayout;
 
-                    case MenuScreen.PauseMenu:
-                        _newLayout = GameObject.Instantiate(_objectReferenceManager.PauseScreenLayout, _objectReferenceManager.PauseScreenLayout.transform);
-                        _newLayout.name = newLayoutName;
-                        _newLayout = DeleteAllChildren(_newLayout);
-                        return _newLayout;
+                    case InternalMenuScreen.PauseMenu:
+                        newLayout = GameObject.Instantiate(_objectReferenceManager.PauseScreenLayout, _objectReferenceManager.PauseScreenLayout.transform);
+                        newLayout.name = newLayoutName;
+                        newLayout = DeleteAllChildren(newLayout);
+                        return newLayout;
 
-                    case MenuScreen.SettingsMenu:
-                        _newLayout = GameObject.Instantiate(_objectReferenceManager.SettingsScreenLayout, _objectReferenceManager.SettingsScreenLayout.transform);
-                        _newLayout.name = newLayoutName;
-                        _newLayout = DeleteAllChildren(_newLayout);
-                        return _newLayout;
+                    case InternalMenuScreen.SettingsMenu:
+                        newLayout = GameObject.Instantiate(_objectReferenceManager.SettingsScreenLayout, _objectReferenceManager.SettingsScreenLayout.transform);
+                        newLayout.name = newLayoutName;
+                        newLayout = DeleteAllChildren(newLayout);
+                        return newLayout;
 
                     default:
                         _logger.LogError($"{targetMenu} isn't a valid menu.");
@@ -198,39 +198,24 @@ namespace LMUI
         /// <summary>
         /// Class containing functions for instantiating and manipulating button GameObjects
         /// </summary>
-        internal class LMUIButton
+        internal class ButtonManager
         {
             readonly Logger _logger;
             readonly ObjectReferenceManager _objectReferenceManager;
-            internal LMUIButton(Logger logger, ObjectReferenceManager objectReferenceManager)
+            internal ButtonManager(Logger logger, ObjectReferenceManager objectReferenceManager)
             {
                 _logger = logger;
                 _objectReferenceManager = objectReferenceManager;
             }
 
-            private GameObject _buttonObject;
             private System.Action _onClickAction;
-
-            internal GameObject ButtonObject
-            {
-                get => _buttonObject;
-                set => _buttonObject = value;
-            }
-
-
             /// <summary>
             /// Allows the user to decide what they want to do when the button is clicked
             /// </summary>
-            internal System.Action OnClickAction
+            internal System.Action InternalOnClickAction
             {
                 get => _onClickAction;
-                set
-                {
-                    if (value != null)
-                    {
-                        _onClickAction = value;
-                    }
-                }
+                set => _onClickAction = value;
             }
 
             /// <summary>
@@ -239,31 +224,32 @@ namespace LMUI
             /// <returns>
             /// Returns the given GameObject with the game buttons' image and settings applied
             /// </returns>
-            internal GameObject StealGameButtonImage(GameObject btnObj)
+            internal GameObject StealGameButtonImage(GameObject buttonObject)
             {
                 try
                 {
-                    GameObject _btnObj = btnObj;
+                    GameObject baseButtonObject = buttonObject;
                     GameObject mainMenuOptionsBtn = _objectReferenceManager.MainMenuOptionsButton;
 
-                    UnityEngine.UI.Image _sourceImage = mainMenuOptionsBtn.GetComponent<UnityEngine.UI.Image>();
-                    UnityEngine.UI.Image _btnImage = _btnObj.GetComponent<UnityEngine.UI.Image>();
+                    UnityEngine.UI.Image sourceImage = mainMenuOptionsBtn.GetComponent<UnityEngine.UI.Image>();
+                    UnityEngine.UI.Image btnImage = baseButtonObject.GetComponent<UnityEngine.UI.Image>();
 
-                    _btnImage.sprite = _sourceImage.sprite;
-                    _btnImage.color = _sourceImage.color;
-                    _btnImage.material = _sourceImage.material;
-                    _btnImage.type = _sourceImage.type;
-                    _btnImage.preserveAspect = _sourceImage.preserveAspect;
+                    btnImage.sprite = sourceImage.sprite;
+                    btnImage.color = sourceImage.color;
+                    btnImage.material = sourceImage.material;
+                    btnImage.type = sourceImage.type;
+                    btnImage.preserveAspect = sourceImage.preserveAspect;
 
-                    return _btnObj;
+                    return baseButtonObject;
                 }
                 catch (Exception)
                 {
-                    _logger.LogError($"Failed to steal the game buttons' image and apply it to: {btnObj.name}");
+                    _logger.LogError($"Failed to steal the game buttons' image and apply it to: {buttonObject.name}");
                     throw;
                 }
             }
 
+            // I plan to make this work for all custom components
             /// <summary>
             /// Register the OnHoverHandler as a type in Il2Cpp. USE ON INITIALISE MELON!
             /// </summary>
@@ -285,18 +271,19 @@ namespace LMUI
             /// <returns>
             /// The given button GameObject with the OnHoverHandler script added
             /// </returns>
-            internal GameObject ApplyHoverHandler(GameObject btnObj)
+            internal GameObject ApplyHoverHandler(GameObject buttonObject)
             {
                 try
                 {
-                    GameObject _btnObj = btnObj;
-                    OnHoverHandler _hoverHandler = _btnObj.AddComponent<OnHoverHandler>();
-                    _hoverHandler.Init();
-                    return _btnObj;
+                    RegisterOnHoverHandler();
+                    GameObject baseButtonObject = buttonObject;
+                    OnHoverHandler hoverHandler = baseButtonObject.AddComponent<OnHoverHandler>();
+                    hoverHandler.Init();
+                    return baseButtonObject;
                 }
                 catch (Exception)
                 {
-                    _logger.LogError($"Failed to apply OnHoverHandler script to {btnObj.name}");
+                    _logger.LogError($"Failed to apply OnHoverHandler script to {buttonObject.name}");
                     throw;
                 }
             }
@@ -307,18 +294,18 @@ namespace LMUI
             /// <returns>
             /// The given button GameObject with the game's hover effect and button image.
             /// </returns>
-            internal GameObject ApplyGameMenuStyle(GameObject btnObj)
+            internal GameObject ApplyGameMenuStyle(GameObject buttonObject)
             {
                 try
                 {
-                    GameObject _btnObj = btnObj;
-                    StealGameButtonImage(_btnObj);
-                    ApplyHoverHandler(_btnObj);
-                    return _btnObj;
+                    GameObject styledButtonObject = buttonObject;
+                    StealGameButtonImage(styledButtonObject);
+                    ApplyHoverHandler(styledButtonObject);
+                    return styledButtonObject;
                 }
                 catch (Exception)
                 {
-                    _logger.LogError($"Failed to apply the game menu style to: {btnObj.name}");
+                    _logger.LogError($"Failed to apply the game menu style to: {buttonObject.name}");
                     throw;
                 }
             }
@@ -329,32 +316,32 @@ namespace LMUI
             /// <returns>
             /// The instatiated prefab as a GameObject
             /// </returns>
-            internal GameObject InstantiateButtonPrefabIntoGameMenu(GameObject btnPrefab, MenuScreen targetMenu, bool useLayout)
+            internal GameObject InstantiateButtonPrefabIntoGameMenu(GameObject buttonPrefab, InternalMenuScreen targetMenu, bool useLayout)
             {
                 try
                 {
                     switch (targetMenu)
                     {
-                        case MenuScreen.MainMenu:
+                        case InternalMenuScreen.MainMenu:
                             if (useLayout)
                             {
-                                return GameObject.Instantiate(btnPrefab, _objectReferenceManager.MainMenuScreenLayout.transform);
+                                return GameObject.Instantiate(buttonPrefab, _objectReferenceManager.MainMenuScreenLayout.transform);
                             }
-                            return GameObject.Instantiate(btnPrefab, _objectReferenceManager.MainMenuScreen.transform);
+                            return GameObject.Instantiate(buttonPrefab, _objectReferenceManager.MainMenuScreen.transform);
 
-                        case MenuScreen.PauseMenu:
+                        case InternalMenuScreen.PauseMenu:
                             if (useLayout)
                             {
-                                return GameObject.Instantiate(btnPrefab, _objectReferenceManager.PauseScreenLayout.transform);
+                                return GameObject.Instantiate(buttonPrefab, _objectReferenceManager.PauseScreenLayout.transform);
                             }
-                            return GameObject.Instantiate(btnPrefab, _objectReferenceManager.PauseScreen.transform);
+                            return GameObject.Instantiate(buttonPrefab, _objectReferenceManager.PauseScreen.transform);
 
-                        case MenuScreen.SettingsMenu:
+                        case InternalMenuScreen.SettingsMenu:
                             if (useLayout)
                             {
-                                return GameObject.Instantiate(btnPrefab, _objectReferenceManager.SettingsScreenLayout.transform);
+                                return GameObject.Instantiate(buttonPrefab, _objectReferenceManager.SettingsScreenLayout.transform);
                             }
-                            return GameObject.Instantiate(btnPrefab, _objectReferenceManager.SettingsScreen.transform);
+                            return GameObject.Instantiate(buttonPrefab, _objectReferenceManager.SettingsScreen.transform);
 
                         default:
                             _logger.LogError($"{targetMenu} isn't a valid menu.");
@@ -363,7 +350,7 @@ namespace LMUI
                 }
                 catch (Exception)
                 {
-                    _logger.LogError($"Failed to instantiate {btnPrefab.name} into {targetMenu}");
+                    _logger.LogError($"Failed to instantiate {buttonPrefab.name} into {targetMenu}");
                     throw;
                 }
             }
@@ -390,17 +377,17 @@ namespace LMUI
             /// <returns>
             /// The given button GameObject with the on click listener added
             /// </returns>
-            internal GameObject AddOnClickListener(GameObject btnObj)
+            internal GameObject AddOnClickListener(GameObject buttonObject)
             {
                 try
                 {
-                    GameObject _btnObj = btnObj;
-                    _btnObj.GetComponent<UnityEngine.UI.Button>().onClick.AddListener((UnityEngine.Events.UnityAction)OnBtnClick);
-                    return _btnObj;
+                    GameObject buttonObjectWithListener = buttonObject;
+                    buttonObjectWithListener.GetComponent<UnityEngine.UI.Button>().onClick.AddListener((UnityEngine.Events.UnityAction)OnBtnClick);
+                    return buttonObjectWithListener;
                 }
                 catch (Exception)
                 {
-                    _logger.LogError($"Failed to add an on click listener to {btnObj.name}");
+                    _logger.LogError($"Failed to add an on click listener to {buttonObject.name}");
                     throw;
                 }
             }

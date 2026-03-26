@@ -1,7 +1,7 @@
 ﻿using MelonLoader.Utils;
 using UnityEngine;
 
-namespace LMUI
+namespace LMUI.Core
 {
     internal class FileHandler
     {
@@ -21,6 +21,9 @@ namespace LMUI
                 _logger = logger;
             }
 
+            /// <summary>
+            /// Creates the default asset bundle folder if it doesn't already exist.
+            /// </summary>
             internal void CreateDefault()
             {
                 try
@@ -43,6 +46,9 @@ namespace LMUI
                 }
             }
 
+            /// <summary>
+            /// Creates a folder at the specified path.
+            /// </summary>
             internal void CreateCustom(string assetBundleFolderPath)
             {
                 try
@@ -66,53 +72,24 @@ namespace LMUI
             }
         }
 
-        public class AssetBundleHandler
+        internal class AssetBundleHandler
         {
-            // Not sure if I'm supposed to add this again or not... \/
-            // Well it fixes the error so I guess it'll be fine
             readonly Logger _logger;
             internal AssetBundleHandler(Logger logger)
             {
                 _logger = logger;
             }
 
-            private string _assetBundleName = null;
-            private string _assetBundleFolderPath = _defaultAssetBundleFolderPath;
             private string _assetBundlePath;
             private AssetBundle _loadedAssetBundle;
 
-            public string FolderPath
-            {
-                get
-                {
-                    return _assetBundleFolderPath;
-                }
-                set
-                {
-                    if (value.GetType() == typeof(string))
-                    {
-                        _assetBundleFolderPath = value;
-                    }
-                }
-            }
-
-            // Name of the asset bundle to load
-            public string BundleName
-            {
-                get
-                {
-                    return _assetBundleName;
-                }
-                set
-                {
-                    if (value.GetType() == typeof(string) && value != null && !value.EndsWith(".assetbundle"))
-                    {
-                        _assetBundleName = value;
-                    }
-                }
-            }
-
-            public AssetBundle LoadAssetBundle(string assetBundleName, string assetBundleFolderPath)
+            /// <summary>
+            /// Loads an asset bundle.
+            /// </summary>
+            /// <returns>
+            /// The loaded asset bundle.
+            /// </returns>
+            internal AssetBundle LoadAssetBundle(string assetBundleName, string assetBundleFolderPath)
             {
                 try
                 {
@@ -160,6 +137,7 @@ namespace LMUI
             /// </summary>
             internal void Unload(AssetBundle loadedAssetBundle)
             {
+                // FIXME
                 if (loadedAssetBundle != null)
                 {
                     System.GC.Collect();

@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace LMUI
+namespace LMUI.Core
 {
     internal class OnHoverHandler : MonoBehaviour
     {

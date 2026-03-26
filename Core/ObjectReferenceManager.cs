@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace LMUI;
+namespace LMUI.Core;
 
 public class ObjectReferenceManager
 {
@@ -27,15 +27,15 @@ public class ObjectReferenceManager
     internal static Color32 LMD_HOVER_TEXT_COLOUR = new(145, 190, 15, 255);
 
     // Set properties
-    public GameObject MainMenuScreen { get; internal set; }
-    public GameObject PauseScreen { get; internal set; }
-    public GameObject SettingsScreen { get; internal set; }
+    internal GameObject MainMenuScreen { get; private set; }
+    internal GameObject PauseScreen { get; private set; }
+    internal GameObject SettingsScreen { get; private set; }
 
-    public GameObject MainMenuScreenLayout { get; internal set; }
-    public GameObject PauseScreenLayout { get; internal set; }
-    public GameObject SettingsScreenLayout { get; internal set; }
+    internal GameObject MainMenuScreenLayout { get; private set; }
+    internal GameObject PauseScreenLayout { get; private set; }
+    internal GameObject SettingsScreenLayout { get; private set; }
 
-    public GameObject MainMenuOptionsButton { get; internal set; }
+    internal GameObject MainMenuOptionsButton { get; private set; }
 
     /// <summary>
     /// Find the given GameObject reference
@@ -43,7 +43,7 @@ public class ObjectReferenceManager
     /// <returns>
     /// The GameObject found at that reference
     /// </returns>
-    public GameObject FindGameObjectReference(string referencePath)
+    internal GameObject FindGameObjectReference(string referencePath)
     {
         try
         {
@@ -74,7 +74,7 @@ public class ObjectReferenceManager
 
     // Clear function for use on scene load
     /// <summary>
-    /// Assigns/reassigns GameObjects to the menu screen properties, intended to be used on scene load
+    /// Assigns/reassigns GameObjects to the menu screen properties. For use on scene load.
     /// </summary>
     public void RefreshReferences()
     {
