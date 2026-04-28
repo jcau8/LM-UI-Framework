@@ -1,5 +1,6 @@
 ﻿using LMUI.Core;
 using UnityEngine;
+using static LMUI.Core.ObjectManager;
 using static LMUI.Helpers.ModHelpers;
 
 namespace LMUI
@@ -10,6 +11,7 @@ namespace LMUI
         private ObjectReferenceManager _objectRefManager;
         private ObjectManager _objectManager;
         private ObjectManager.ButtonManager _buttonManager;
+        private ObjectManager.MenuManager _menuManager;
         private FileHandler.AssetBundleHandler _assetBundleHandler;
         private FileHandler.AssetBundlesFolder _assetBundlesFolder;
         private static CoreShell _instance;
@@ -18,6 +20,7 @@ namespace LMUI
             ObjectReferenceManager objectReferenceManager,
             ObjectManager objectManager,
             ObjectManager.ButtonManager buttonManager,
+            ObjectManager.MenuManager menuManager,
             FileHandler.AssetBundleHandler assetBundleHandler,
             FileHandler.AssetBundlesFolder assetBundlesFolder
             )
@@ -25,6 +28,7 @@ namespace LMUI
             _objectRefManager = objectReferenceManager;
             _objectManager = objectManager;
             _buttonManager = buttonManager;
+            _menuManager = menuManager;
             _assetBundleHandler = assetBundleHandler;
             _assetBundlesFolder = assetBundlesFolder;
         }
@@ -39,6 +43,7 @@ namespace LMUI
                 ObjectReferenceManager objectRefManager = new(logger);
                 ObjectManager objectManager = new(logger, objectRefManager);
                 ObjectManager.ButtonManager buttonManager = new(logger, objectRefManager);
+                ObjectManager.MenuManager menuManager = new(logger, objectRefManager);
                 FileHandler.AssetBundleHandler assetBundleHandler = new(logger);
                 FileHandler.AssetBundlesFolder assetBundlesFolder = new(logger);
 
@@ -47,13 +52,14 @@ namespace LMUI
                     objectRefManager,
                     objectManager,
                     buttonManager,
+                    menuManager,
                     assetBundleHandler,
                     assetBundlesFolder
                     );
             }
         }
 
-        public void CheckForActiveInstance()
+        public static void CheckForActiveInstance()
         {
             if (_instance == null)
             {
@@ -61,20 +67,22 @@ namespace LMUI
             }
         }
 
-        /// <summary>
-        /// Allows the user to decide what they want to do when the button is clicked.
-        /// </summary>
-        public System.Action OnClickAction
-        {
-            get => _buttonManager.InternalOnClickAction;
-            set
-            {
-                if (value != null)
-                {
-                    _buttonManager.InternalOnClickAction = value;
-                }
-            }
-        }
+        // Game menu properties
+        public GameObject LMDUIWrapper => _objectRefManager.LMDUIWrapper;
+
+        public GameObject MainMenuScreen => _objectRefManager.MainMenuScreen;
+        public GameObject PauseScreen => _objectRefManager.PauseScreen;
+        public GameObject SettingsScreen => _objectRefManager.SettingsScreen;
+
+        public GameObject MainMenuScreenLayout => _objectRefManager.MainMenuScreenLayout;
+        public GameObject PauseScreenLayout => _objectRefManager.PauseScreenLayout;
+        public GameObject SettingsScreenLayout => _objectRefManager.SettingsScreenLayout;
+
+        public GameObject MainMenuOptionsButton => _objectRefManager.MainMenuOptionsButton;
+        internal GameObject MainMenuOptionsButtonElements => _objectRefManager.MainMenuOptionsButtonElements;
+
+        internal GameObject SettingsEnumLayout => _objectRefManager.SettingsEnumLayout;
+        internal GameObject SettingsEnumLanguage => _objectRefManager.SettingsEnumLanguage;
 
         /// <summary>
         /// Holds all possible menu screen types.
@@ -94,6 +102,7 @@ namespace LMUI
         /// </returns>
         public GameObject FindGameObjectReference(string referencePath)
         {
+            CheckForActiveInstance();
             return _objectRefManager.FindGameObjectReference(referencePath);
         }
 
@@ -102,6 +111,7 @@ namespace LMUI
         /// </summary>
         public void RefreshReferences()
         {
+            CheckForActiveInstance();
             _objectRefManager.RefreshReferences();
         }
 
@@ -113,6 +123,7 @@ namespace LMUI
         /// </returns>
         public GameObject LoadPrefabFromBundle(AssetBundle loadedAssetBundle, string prefabPath)
         {
+            CheckForActiveInstance();
             return _objectManager.LoadPrefabFromBundle(loadedAssetBundle, prefabPath);
         }
 
@@ -124,6 +135,7 @@ namespace LMUI
         /// </returns>
         public bool TargetMenuActive(MenuScreen targetMenu)
         {
+            CheckForActiveInstance();
             return _objectManager.TargetMenuActive(ToInternal(targetMenu));
         }
 
@@ -133,9 +145,21 @@ namespace LMUI
         /// <returns>
         /// The instantiated prefab as a GameObject.
         /// </returns>
-        public GameObject InstantiatePrefabIntoMenuScreen(GameObject prefab, MenuScreen targetMenu)
+        public GameObject InstantiatePrefabIntoGameMenu(GameObject prefab, MenuScreen targetMenu)
         {
-            return _objectManager.InstantiatePrefabIntoMenuScreen(prefab, ToInternal(targetMenu));
+            CheckForActiveInstance();
+            return _objectManager.InstantiatePrefabIntoGameMenu(prefab, ToInternal(targetMenu));
+        }
+
+        /// <summary>
+        /// Instantiates a prefab (which isn't a button) into a custom menu.
+        /// </summary>
+        /// <returns>
+        /// The instatiated prefab as a GameObject.
+        /// </returns>
+        public GameObject InstantiatePrefabIntoCustomMenu(GameObject prefab, GameObject menu)
+        {
+            return _objectManager.InstantiatePrefabIntoCustomMenu(prefab, menu);
         }
 
         /// <summary>
@@ -146,6 +170,7 @@ namespace LMUI
         /// </returns>
         public GameObject DeleteAllChildren(GameObject parentObject)
         {
+            CheckForActiveInstance();
             return _objectManager.DeleteAllChildren(parentObject);
         }
 
@@ -157,7 +182,25 @@ namespace LMUI
         /// </returns>
         public GameObject DuplicateAndClearLayoutFromMenu(MenuScreen targetMenu, string newLayoutName)
         {
+            CheckForActiveInstance();
             return _objectManager.DuplicateAndClearLayoutFromMenu(ToInternal(targetMenu), newLayoutName);
+        }
+        public GameObject DuplicateAndClearLayoutFromMenu(GameObject targetLayout, string newLayoutName)
+        {
+            CheckForActiveInstance();
+            return _objectManager.DuplicateAndClearLayoutFromMenu(targetLayout, newLayoutName);
+        }
+
+        /// <summary>
+        /// Steals the game's language setting image and applies it to the given GameObject
+        /// </summary>
+        /// <returns>
+        /// The given GameObject with the language setting's image applied
+        /// </returns>
+        public GameObject StealGameSettingImage(GameObject baseObject)
+        {
+            CheckForActiveInstance();
+            return _objectManager.StealGameSettingImage(baseObject);
         }
 
         /// <summary>
@@ -168,7 +211,20 @@ namespace LMUI
         /// </returns>
         public GameObject StealGameButtonImage(GameObject buttonObject)
         {
+            CheckForActiveInstance();
             return _buttonManager.StealGameButtonImage(buttonObject);
+        }
+
+        /// <summary>
+        /// Takes the TMP formatting from a default game button and applies them to the given GameObject.
+        /// </summary>
+        /// <returns>
+        /// The given GameObject with the game button's text formatting.
+        /// </returns>
+        public GameObject StealGameButtonTextFormatting(GameObject buttonObject)
+        {
+            CheckForActiveInstance();
+            return _buttonManager.StealGameButtonTextFormatting(buttonObject);
         }
 
         /// <summary>
@@ -179,17 +235,19 @@ namespace LMUI
         /// </returns>
         public GameObject ApplyHoverHandler(GameObject buttonObject)
         {
+            CheckForActiveInstance();
             return _buttonManager.ApplyHoverHandler(buttonObject);
         }
 
         /// <summary>
-        /// Applies the game's hover effect and button image to a button GameObject.
+        /// Applies the game's hover effect, button image and text formatting to a button GameObject.
         /// </summary>
         /// <returns>
-        /// The given button GameObject with the game's hover effect and button image.
+        /// The given button GameObject with the game's hover effect, button image and texxt formatting.
         /// </returns>
         public GameObject ApplyGameMenuStyle(GameObject buttonObject)
         {
+            CheckForActiveInstance();
             return _buttonManager.ApplyGameMenuStyle(buttonObject);
         }
 
@@ -199,9 +257,31 @@ namespace LMUI
         /// <returns>
         /// The instantiated prefab as a GameObject.
         /// </returns>
-        public GameObject InstantiateButtonPrefabIntoGameMenu(GameObject buttonPrefab, MenuScreen targetMenu,  bool useLayout)
+        public GameObject InstantiateButtonPrefabIntoGameMenu(GameObject buttonPrefab, MenuScreen targetGameMenu,  bool useLayout)
         {
-            return _buttonManager.InstantiateButtonPrefabIntoGameMenu(buttonPrefab, ToInternal(targetMenu), useLayout);
+            CheckForActiveInstance();
+            return _buttonManager.InstantiateButtonPrefabIntoGameMenu(buttonPrefab, ToInternal(targetGameMenu), useLayout);
+        }
+
+        /// <summary>
+        /// Instantiate a prefab (which will be used as a button) into a custom menu.
+        /// </summary>
+        /// <returns>
+        /// The instatiated prefab as a GameObject.
+        /// </returns>
+        public GameObject InstantiateButtonPrefabIntoCustomMenu(GameObject buttonPrefab, GameObject menu)
+        {
+            CheckForActiveInstance();
+            return _buttonManager.InstantiateButtonPrefabIntoCustomMenu(buttonPrefab, menu);
+        }
+
+        /// <summary>
+        /// Sets the text of an existing button.
+        /// </summary>
+        public void SetButtonText(GameObject buttonObject, string text)
+        {
+            CheckForActiveInstance();
+            _buttonManager.SetButtonText(buttonObject, text);
         }
 
         /// <summary>
@@ -210,9 +290,52 @@ namespace LMUI
         /// <returns>
         /// The given button GameObject with the on click listener added.
         /// </returns>
-        public GameObject AddOnClickListener(GameObject buttonObject)
+        public GameObject AddOnClickListener(GameObject buttonObject, System.Action onClickAction)
         {
-            return _buttonManager.AddOnClickListener(buttonObject);
+            CheckForActiveInstance();
+            return _buttonManager.AddOnClickListener(buttonObject, onClickAction);
+        }
+
+        /// <summary>
+        /// Checks if a given game menu has been exists.
+        /// </summary>
+        /// <returns>
+        /// A boolean of whether or not the given menu exists.
+        /// </returns>
+        internal bool GameMenuExists(MenuScreen targetMenu)
+        {
+            CheckForActiveInstance();
+            return _menuManager.GameMenuExists(ToInternal(targetMenu));
+        }
+
+        /// <summary>
+        /// Enables the given game menu.
+        /// </summary>
+        public void EnableGameMenu(MenuScreen targetMenu)
+        {
+            CheckForActiveInstance();
+            _menuManager.EnableGameMenu(ToInternal(targetMenu));
+        }
+
+        /// <summary>
+        /// Disables the given game menu.
+        /// </summary>
+        public void DisableGameMenu(MenuScreen targetMenu)
+        {
+            CheckForActiveInstance();
+            _menuManager.DisableGameMenu(ToInternal(targetMenu));
+        }
+
+        /// <summary>
+        /// Checks whether any of the game menu screens are active.
+        /// </summary>
+        /// <returns>
+        /// The active MenuScreen if there is one. If there are no active menu screens then it returns default.
+        /// </returns>
+        public MenuScreen GetActiveGameMenu()
+        {
+            CheckForActiveInstance();
+            return ToPublic(_menuManager.GetActiveGameMenu());
         }
 
         /// <summary>
@@ -220,6 +343,7 @@ namespace LMUI
         /// </summary>
         public void CreateDefault()
         {
+            CheckForActiveInstance();
             _assetBundlesFolder.CreateDefault();
         }
 
@@ -228,6 +352,7 @@ namespace LMUI
         /// </summary>
         public void CreateCustom(string assetBundleFolderPath)
         {
+            CheckForActiveInstance();
             _assetBundlesFolder.CreateCustom(assetBundleFolderPath);
         }
 
@@ -239,6 +364,7 @@ namespace LMUI
         /// </returns>
         public AssetBundle LoadAssetBundle(string assetBundleName, string assetBundleFolderPath)
         {
+            CheckForActiveInstance();
             return _assetBundleHandler.LoadAssetBundle(assetBundleName, assetBundleFolderPath);
         }
 
@@ -247,6 +373,7 @@ namespace LMUI
         /// </summary>
         public void Unload(AssetBundle loadedAssetBundle)
         {
+            CheckForActiveInstance();
             // FIXME
             _assetBundleHandler.Unload(loadedAssetBundle);
         }
