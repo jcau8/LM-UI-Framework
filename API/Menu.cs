@@ -1,15 +1,9 @@
-﻿using static LMUI.Core.ObjectManager;
-using static LMUI.CoreShell;
+﻿using static LMUI.CoreShell;
 
 namespace LMUI.API
 {
     public class Menu
     {
-        //public void Create()
-        //{
-        //    // placeholder
-        //}
-
         public class GameMenu
         {
             /// <summary>

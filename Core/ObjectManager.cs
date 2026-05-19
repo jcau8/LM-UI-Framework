@@ -1,8 +1,6 @@
 ﻿using Il2CppInterop.Runtime.Injection;
 using Il2CppTMPro;
 using UnityEngine;
-using static LMUI.CoreShell;
-using static MelonLoader.MelonLogger;
 
 namespace LMUI.Core
 {
@@ -63,32 +61,6 @@ namespace LMUI.Core
         }
 
         /// <summary>
-        /// Checks whether the given menu screen is active or not.
-        /// </summary>
-        /// <returns>
-        /// A boolean representing the state of the given menu.
-        /// </returns>
-        internal bool TargetMenuActive(InternalMenuScreen targetMenu)
-        {
-            // Using the layouts instead of the actual screens due to the order of which they are added.
-            // Once the layout is added we know that the actual menu exists.
-            switch (targetMenu)
-            {
-                case InternalMenuScreen.MainMenu:
-                    return _objectReferenceManager.MainMenuScreenLayout != null;
-
-                case InternalMenuScreen.PauseMenu:
-                    return _objectReferenceManager.PauseScreenLayout != null;
-
-                case InternalMenuScreen.SettingsMenu:
-                    return _objectReferenceManager.SettingsScreenLayout != null;
-
-                default:
-                    return false;
-            }
-        }
-
-        /// <summary>
         /// Instantiate a prefab (which isn't a button) into a game menu.
         /// </summary>
         /// <returns>
@@ -96,33 +68,28 @@ namespace LMUI.Core
         /// </returns>
         internal GameObject InstantiatePrefabIntoGameMenu(GameObject prefab, InternalMenuScreen targetGameMenu)
         {
-            // There is probably a better way to handle when the menu isn't active
             try
             {
-                if (TargetMenuActive(targetGameMenu))
+                switch (targetGameMenu)
                 {
-                    switch (targetGameMenu)
-                    {
-                        case InternalMenuScreen.MainMenu:
-                            return GameObject.Instantiate(prefab, _objectReferenceManager.MainMenuScreen.transform);
+                    case InternalMenuScreen.MainMenu:
+                        return GameObject.Instantiate(prefab, _objectReferenceManager.MainMenuScreen.transform);
 
-                        case InternalMenuScreen.PauseMenu:
-                            return GameObject.Instantiate(prefab, _objectReferenceManager.PauseScreen.transform);
+                    case InternalMenuScreen.PauseMenu:
+                        return GameObject.Instantiate(prefab, _objectReferenceManager.PauseScreen.transform);
 
-                        case InternalMenuScreen.SettingsMenu:
-                            return GameObject.Instantiate(prefab, _objectReferenceManager.SettingsScreen.transform);
+                    case InternalMenuScreen.SettingsMenu:
+                        return GameObject.Instantiate(prefab, _objectReferenceManager.SettingsScreen.transform);
 
-                        default:
-                            _logger.LogError($"{targetGameMenu} isn't a valid menu.");
-                            return null;
-                    }
+                    default:
+                        _logger.LogError($"{targetGameMenu} isn't a valid menu.");
+                        return null;
                 }
-                _logger.LogInfo($"{targetGameMenu} isn't active. Returning null...");
-                return null;
             }
             catch (Exception)
             {
                 _logger.LogError($"Failed to instantiate prefab: {prefab.name} into menu: {targetGameMenu}");
+                _logger.LogInfo("Does the menu exist?");
                 throw;
             }
         }
@@ -169,71 +136,6 @@ namespace LMUI.Core
             catch (Exception)
             {
                 _logger.LogError($"Failed to delete children from {parentObject.name}");
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Duplicates the layout GameObject from a menu and removes all children
-        /// </summary>
-        /// <returns>
-        /// A menu layout GameObject with children removed
-        /// </returns>
-        internal GameObject DuplicateAndClearLayoutFromMenu(InternalMenuScreen targetMenu, string newLayoutName)
-        {
-            try
-            {
-                GameObject newLayout;
-                switch (targetMenu)
-                {
-                    case InternalMenuScreen.MainMenu:
-                        newLayout = GameObject.Instantiate(_objectReferenceManager.MainMenuScreenLayout, _objectReferenceManager.LMDUIWrapper.transform);
-                        newLayout.name = newLayoutName;
-                        newLayout = DeleteAllChildren(newLayout);
-                        return newLayout;
-
-                    case InternalMenuScreen.PauseMenu:
-                        newLayout = GameObject.Instantiate(_objectReferenceManager.PauseScreenLayout, _objectReferenceManager.LMDUIWrapper.transform);
-                        newLayout.name = newLayoutName;
-                        newLayout = DeleteAllChildren(newLayout);
-                        return newLayout;
-
-                    case InternalMenuScreen.SettingsMenu:
-                        newLayout = GameObject.Instantiate(_objectReferenceManager.SettingsScreenLayout, _objectReferenceManager.LMDUIWrapper.transform);
-                        newLayout.name = newLayoutName;
-                        newLayout = DeleteAllChildren(newLayout);
-                        return newLayout;
-
-                    default:
-                        _logger.LogError($"{targetMenu} isn't a valid menu.");
-                        return null;
-                }
-            }
-            catch (Exception)
-            {
-                _logger.LogError($"Failed to duplicate and clear the layout from {targetMenu}");
-                throw;
-            }
-        }
-        /// <summary>
-        /// Duplicates the layout GameObject from a menu and removes all children
-        /// </summary>
-        /// <returns>
-        /// A menu layout GameObject with children removed
-        /// </returns>
-        internal GameObject DuplicateAndClearLayoutFromMenu(GameObject targetLayout, string newLayoutName)
-        {
-            try
-            {
-                GameObject newLayout;
-                newLayout = GameObject.Instantiate(targetLayout, _objectReferenceManager.LMDUIWrapper.transform);
-                newLayout.name = newLayoutName;
-                newLayout = DeleteAllChildren(newLayout);
-                return newLayout;
-            }
-            catch (Exception)
-            {
-                _logger.LogError($"Failed to duplicate and clear the layout from {targetLayout.name}");
                 throw;
             }
         }
@@ -417,48 +319,53 @@ namespace LMUI.Core
                 }
             }
 
+            internal GameObject InstantiateButtonPrefabUnderParent(GameObject buttonPrefab, Transform parentTransform)
+            {
+                try
+                {
+                    return GameObject.Instantiate(buttonPrefab, parentTransform);
+                }
+                catch (Exception)
+                {
+                    _logger.LogError($"Failed to instantiate {buttonPrefab.name} under {parentTransform.name}");
+                    throw;
+                }
+            }
+
             /// <summary>
             /// Instantiate a prefab (which will be used as a button) into a game menu
             /// </summary>
             /// <returns>
             /// The instatiated prefab as a GameObject
             /// </returns>
-            internal GameObject InstantiateButtonPrefabIntoGameMenu(GameObject buttonPrefab, InternalMenuScreen targetGameMenu, bool useLayout)
+            internal GameObject InstantiateButtonPrefabIntoGameMenu(GameObject buttonPrefab, InternalMenuScreen targetGameMenu, bool useLayout=false)
             {
-                try
+                switch (targetGameMenu)
                 {
-                    switch (targetGameMenu)
-                    {
-                        case InternalMenuScreen.MainMenu:
-                            if (useLayout)
-                            {
-                                return GameObject.Instantiate(buttonPrefab, _objectReferenceManager.MainMenuScreenLayout.transform);
-                            }
-                            return GameObject.Instantiate(buttonPrefab, _objectReferenceManager.MainMenuScreen.transform);
+                    case InternalMenuScreen.MainMenu:
+                        if (useLayout)
+                        {
+                            return InstantiateButtonPrefabUnderParent(buttonPrefab, _objectReferenceManager.MainMenuScreenLayout.transform);
+                        }
+                        return InstantiateButtonPrefabUnderParent(buttonPrefab, _objectReferenceManager.MainMenuScreen.transform);
 
-                        case InternalMenuScreen.PauseMenu:
-                            if (useLayout)
-                            {
-                                return GameObject.Instantiate(buttonPrefab, _objectReferenceManager.PauseScreenLayout.transform);
-                            }
-                            return GameObject.Instantiate(buttonPrefab, _objectReferenceManager.PauseScreen.transform);
+                    case InternalMenuScreen.PauseMenu:
+                        if (useLayout)
+                        {
+                            return InstantiateButtonPrefabUnderParent(buttonPrefab, _objectReferenceManager.PauseScreenLayout.transform);
+                        }
+                        return InstantiateButtonPrefabUnderParent(buttonPrefab, _objectReferenceManager.PauseScreen.transform);
 
-                        case InternalMenuScreen.SettingsMenu:
-                            if (useLayout)
-                            {
-                                return GameObject.Instantiate(buttonPrefab, _objectReferenceManager.SettingsScreenLayout.transform);
-                            }
-                            return GameObject.Instantiate(buttonPrefab, _objectReferenceManager.SettingsScreen.transform);
+                    case InternalMenuScreen.SettingsMenu:
+                        if (useLayout)
+                        {
+                            return InstantiateButtonPrefabUnderParent(buttonPrefab, _objectReferenceManager.SettingsScreenLayout.transform);
+                        }
+                        return InstantiateButtonPrefabUnderParent(buttonPrefab, _objectReferenceManager.SettingsScreen.transform);
 
-                        default:
-                            _logger.LogError($"{targetGameMenu} isn't a valid menu.");
-                            return null;
-                    }
-                }
-                catch (Exception)
-                {
-                    _logger.LogError($"Failed to instantiate {buttonPrefab.name} into {targetGameMenu}");
-                    throw;
+                    default:
+                        _logger.LogError($"{targetGameMenu} isn't a valid menu.");
+                        return null;
                 }
             }
 
@@ -470,15 +377,7 @@ namespace LMUI.Core
             /// </returns>
             internal GameObject InstantiateButtonPrefabIntoCustomMenu(GameObject buttonPrefab, GameObject menu)
             {
-                try
-                {
-                    return GameObject.Instantiate(buttonPrefab, menu.transform);
-                }
-                catch (Exception)
-                {
-                    _logger.LogError($"Failed to instantiate {buttonPrefab.name} into {menu.name}");
-                    throw;
-                }
+                return InstantiateButtonPrefabUnderParent(buttonPrefab, menu.transform);
             }
 
             /// <summary>
@@ -524,12 +423,12 @@ namespace LMUI.Core
         internal class MenuManager
         {
             readonly Logger _logger;
-            readonly ObjectReferenceManager _objectRefManager;
+            readonly ObjectReferenceManager _objectReferenceManager;
 
             internal MenuManager(Logger logger, ObjectReferenceManager objectReferenceManager)
             {
                 _logger = logger;
-                _objectRefManager = objectReferenceManager;
+                _objectReferenceManager = objectReferenceManager;
             }
 
             /// <summary>
@@ -543,13 +442,13 @@ namespace LMUI.Core
                 switch (targetMenu)
                 {
                     case InternalMenuScreen.MainMenu:
-                        return _objectRefManager.MainMenuScreen != null;
+                        return _objectReferenceManager.MainMenuScreen != null;
 
                     case InternalMenuScreen.PauseMenu:
-                        return _objectRefManager.PauseScreen != null;
+                        return _objectReferenceManager.PauseScreen != null;
 
                     case InternalMenuScreen.SettingsMenu:
-                        return _objectRefManager.SettingsScreen != null;
+                        return _objectReferenceManager.SettingsScreen != null;
 
                     default:
                         _logger.LogInfo($"{targetMenu} is not a valid game menu.");
@@ -562,23 +461,31 @@ namespace LMUI.Core
             /// </summary>
             internal void EnableGameMenu(InternalMenuScreen targetMenu)
             {
-                switch (targetMenu)
+                try
                 {
-                    case InternalMenuScreen.MainMenu:
-                        _objectRefManager.MainMenuScreen.SetActive(true);
-                        return;
+                    switch (targetMenu)
+                    {
+                        case InternalMenuScreen.MainMenu:
+                            _objectReferenceManager.MainMenuScreen.SetActive(true);
+                            return;
 
-                    case InternalMenuScreen.PauseMenu:
-                        _objectRefManager.PauseScreen.SetActive(true);
-                        return;
+                        case InternalMenuScreen.PauseMenu:
+                            _objectReferenceManager.PauseScreen.SetActive(true);
+                            return;
 
-                    case InternalMenuScreen.SettingsMenu:
-                        _objectRefManager.SettingsScreen.SetActive(true);
-                        return;
+                        case InternalMenuScreen.SettingsMenu:
+                            _objectReferenceManager.SettingsScreen.SetActive(true);
+                            return;
 
-                    default:
-                        _logger.LogInfo($"{targetMenu} is not a valid game menu.");
-                        return;
+                        default:
+                            _logger.LogInfo($"{targetMenu} is not a valid game menu.");
+                            return;
+                    }
+                }
+                catch (Exception)
+                {
+                    _logger.LogError($"Failed to enable {targetMenu}. Does it even exist yet?");
+                    throw;
                 }
             }
 
@@ -587,23 +494,31 @@ namespace LMUI.Core
             /// </summary>
             internal void DisableGameMenu(InternalMenuScreen targetMenu)
             {
-                switch (targetMenu)
+                try
                 {
-                    case InternalMenuScreen.MainMenu:
-                        _objectRefManager.MainMenuScreen.SetActive(false);
-                        return;
+                    switch (targetMenu)
+                    {
+                        case InternalMenuScreen.MainMenu:
+                            _objectReferenceManager.MainMenuScreen.SetActive(false);
+                            return;
 
-                    case InternalMenuScreen.PauseMenu:
-                        _objectRefManager.PauseScreen.SetActive(false);
-                        return;
+                        case InternalMenuScreen.PauseMenu:
+                            _objectReferenceManager.PauseScreen.SetActive(false);
+                            return;
 
-                    case InternalMenuScreen.SettingsMenu:
-                        _objectRefManager.SettingsScreen.SetActive(false);
-                        return;
+                        case InternalMenuScreen.SettingsMenu:
+                            _objectReferenceManager.SettingsScreen.SetActive(false);
+                            return;
 
-                    default:
-                        _logger.LogInfo($"{targetMenu} is not a valid game menu.");
-                        return;
+                        default:
+                            _logger.LogInfo($"{targetMenu} is not a valid game menu.");
+                            return;
+                    }
+                }
+                catch (Exception)
+                {
+                    _logger.LogError($"Failed to disable {targetMenu}. Does it even exist yet?");
+                    throw;
                 }
             }
 
@@ -617,15 +532,15 @@ namespace LMUI.Core
             {
                 try
                 {
-                    if (_objectRefManager.MainMenuScreen.activeInHierarchy)
+                    if (_objectReferenceManager.MainMenuScreen.activeInHierarchy)
                     {
                         return InternalMenuScreen.MainMenu;
                     }
-                    else if (_objectRefManager.PauseScreen.activeInHierarchy)
+                    else if (_objectReferenceManager.PauseScreen.activeInHierarchy)
                     {
                         return InternalMenuScreen.PauseMenu;
                     }
-                    else if (_objectRefManager.SettingsScreen.activeInHierarchy)
+                    else if (_objectReferenceManager.SettingsScreen.activeInHierarchy)
                     {
                         return InternalMenuScreen.SettingsMenu;
                     }
@@ -637,6 +552,75 @@ namespace LMUI.Core
                 catch (Exception)
                 {
                     _logger.LogError("Failed to find an active game menu. Do the menus even exist yet?");
+                    throw;
+                }
+            }
+        }
+
+        internal class LayoutManager
+        {
+            Logger _logger;
+            ObjectReferenceManager _objectReferenceManager;
+            ObjectManager _objectManager;
+
+            internal LayoutManager(Logger logger, ObjectReferenceManager objectReferenceManager, ObjectManager objectManager)
+            {
+                _logger = logger;
+                _objectReferenceManager = objectReferenceManager;
+                _objectManager = objectManager;
+            }
+
+            /// <summary>
+            /// Duplicates the layout GameObject from a menu and removes all children
+            /// </summary>
+            /// <returns>
+            /// A menu layout GameObject with children removed
+            /// </returns>
+            internal GameObject DuplicateAndClearLayoutFromMenu(GameObject targetLayout, string newLayoutName)
+            {
+                try
+                {
+                    GameObject newLayout;
+                    newLayout = GameObject.Instantiate(targetLayout, _objectReferenceManager.LMDUIWrapper.transform);
+                    newLayout.name = newLayoutName;
+                    newLayout = _objectManager.DeleteAllChildren(newLayout);
+                    return newLayout;
+                }
+                catch (Exception)
+                {
+                    _logger.LogError($"Failed to duplicate and clear the layout from {targetLayout.name}");
+                    throw;
+                }
+            }
+            /// <summary>
+            /// Duplicates the layout GameObject from a menu and removes all children
+            /// </summary>
+            /// <returns>
+            /// A menu layout GameObject with children removed
+            /// </returns>
+            internal GameObject DuplicateAndClearLayoutFromMenu(InternalMenuScreen targetMenu, string newLayoutName)
+            {
+                try
+                {
+                    switch (targetMenu)
+                    {
+                        case InternalMenuScreen.MainMenu:
+                            return DuplicateAndClearLayoutFromMenu(_objectReferenceManager.MainMenuScreenLayout, newLayoutName);
+
+                        case InternalMenuScreen.PauseMenu:
+                            return DuplicateAndClearLayoutFromMenu(_objectReferenceManager.PauseScreenLayout, newLayoutName);
+
+                        case InternalMenuScreen.SettingsMenu:
+                            return DuplicateAndClearLayoutFromMenu(_objectReferenceManager.SettingsScreenLayout, newLayoutName);
+
+                        default:
+                            _logger.LogError($"{targetMenu} isn't a valid menu.");
+                            return null;
+                    }
+                }
+                catch (Exception)
+                {
+                    _logger.LogError($"Failed to duplicate and clear the layout from {targetMenu}");
                     throw;
                 }
             }

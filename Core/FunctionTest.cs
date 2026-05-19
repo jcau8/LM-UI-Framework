@@ -3,7 +3,7 @@ using UnityEngine;
 using static LMUI.CoreShell;
 using LMUI.API;
 
-[assembly: MelonInfo(typeof(LMUI.Core.FunctionTest), "LMD UI Lib", "1.0.0", "DevdudeX and jcau8", null)]
+[assembly: MelonInfo(typeof(LMUI.Core.FunctionTest), "LMD UI Lib", "1.0.0", "Jcau8 and DevdudeX", null)]
 [assembly: MelonGame("Megagon Industries", "Lonely Mountains: Downhill")]
 
 namespace LMUI.Core
@@ -35,7 +35,7 @@ namespace LMUI.Core
                 _logger.LogInfo("Successfully initialised scripts");
 
                 _logger.LogInfo("Creating AssetBundles folder");
-                Instance.CreateDefault();
+                Instance.CreateDefaultAssetBundleFolder();
                 _logger.LogInfo("AssetBundles folder created in game root dir");
 
                 _logger.LogInfo("Loading testbundle");
@@ -107,7 +107,7 @@ namespace LMUI.Core
                     if (!_btnInstantiated)
                     {
                         _logger.LogInfo("Creating testbutton");
-                        _buttonObject = _button.Create(_testButtonPrefab, MenuScreen.MainMenu, OnTestButtonClick, true, true);
+                        _buttonObject = _button.Create(_testButtonPrefab, MenuScreen.MainMenu, OnTestButtonClick, useLayout: true, useGameMenuStyle: true);
                         if (_buttonObject != null)
                         {
                             _logger.LogInfo("testbutton created");
@@ -124,11 +124,11 @@ namespace LMUI.Core
         {
             _logger.LogInfo("Button clicked");
             _gameMenu.Disable(MenuScreen.MainMenu);
-            GameObject custLayout = _layout.Create(MenuScreen.MainMenu, "CustomLayout");
+            GameObject custLayout = _layout.CreateDuplicate(MenuScreen.MainMenu, "CustomLayout");
 
             for (int i=0; i < 4; i++)
             {
-                _button.Create(_testButtonPrefab, custLayout, $"Button {i + 1}", LogButtonClick, true);
+                _button.Create(_testButtonPrefab, custLayout, LogButtonClick, optionalText: $"Button {i + 1}", useGameMenuStyle: true);
             }
         }
 

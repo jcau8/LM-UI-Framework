@@ -10,7 +10,7 @@ namespace LMUI.API
         public void CreateDefault()
         {
             Init();
-            Instance.CreateDefault();
+            Instance.CreateDefaultAssetBundleFolder();
         }
 
         /// <summary>
@@ -19,7 +19,7 @@ namespace LMUI.API
         public void CreateCustom(string assetBundleFolderPath)
         {
             Init();
-            Instance.CreateCustom(assetBundleFolderPath);
+            Instance.CreateCustomAssetBundleFolder(assetBundleFolderPath);
         }
     }
 }

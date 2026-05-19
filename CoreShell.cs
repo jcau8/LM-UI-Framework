@@ -1,6 +1,5 @@
 ﻿using LMUI.Core;
 using UnityEngine;
-using static LMUI.Core.ObjectManager;
 using static LMUI.Helpers.ModHelpers;
 
 namespace LMUI
@@ -12,6 +11,7 @@ namespace LMUI
         private ObjectManager _objectManager;
         private ObjectManager.ButtonManager _buttonManager;
         private ObjectManager.MenuManager _menuManager;
+        private ObjectManager.LayoutManager _layoutManager;
         private FileHandler.AssetBundleHandler _assetBundleHandler;
         private FileHandler.AssetBundlesFolder _assetBundlesFolder;
         private static CoreShell _instance;
@@ -21,6 +21,7 @@ namespace LMUI
             ObjectManager objectManager,
             ObjectManager.ButtonManager buttonManager,
             ObjectManager.MenuManager menuManager,
+            ObjectManager.LayoutManager layoutManager,
             FileHandler.AssetBundleHandler assetBundleHandler,
             FileHandler.AssetBundlesFolder assetBundlesFolder
             )
@@ -29,6 +30,7 @@ namespace LMUI
             _objectManager = objectManager;
             _buttonManager = buttonManager;
             _menuManager = menuManager;
+            _layoutManager = layoutManager;
             _assetBundleHandler = assetBundleHandler;
             _assetBundlesFolder = assetBundlesFolder;
         }
@@ -44,6 +46,7 @@ namespace LMUI
                 ObjectManager objectManager = new(logger, objectRefManager);
                 ObjectManager.ButtonManager buttonManager = new(logger, objectRefManager);
                 ObjectManager.MenuManager menuManager = new(logger, objectRefManager);
+                ObjectManager.LayoutManager layoutManager = new(logger, objectRefManager, objectManager);
                 FileHandler.AssetBundleHandler assetBundleHandler = new(logger);
                 FileHandler.AssetBundlesFolder assetBundlesFolder = new(logger);
 
@@ -53,6 +56,7 @@ namespace LMUI
                     objectManager,
                     buttonManager,
                     menuManager,
+                    layoutManager,
                     assetBundleHandler,
                     assetBundlesFolder
                     );
@@ -79,10 +83,10 @@ namespace LMUI
         public GameObject SettingsScreenLayout => _objectRefManager.SettingsScreenLayout;
 
         public GameObject MainMenuOptionsButton => _objectRefManager.MainMenuOptionsButton;
-        internal GameObject MainMenuOptionsButtonElements => _objectRefManager.MainMenuOptionsButtonElements;
+        public GameObject MainMenuOptionsButtonElements => _objectRefManager.MainMenuOptionsButtonElements;
 
-        internal GameObject SettingsEnumLayout => _objectRefManager.SettingsEnumLayout;
-        internal GameObject SettingsEnumLanguage => _objectRefManager.SettingsEnumLanguage;
+        public GameObject SettingsEnumLayout => _objectRefManager.SettingsEnumLayout;
+        public GameObject SettingsEnumLanguage => _objectRefManager.SettingsEnumLanguage;
 
         /// <summary>
         /// Holds all possible menu screen types.
@@ -125,18 +129,6 @@ namespace LMUI
         {
             CheckForActiveInstance();
             return _objectManager.LoadPrefabFromBundle(loadedAssetBundle, prefabPath);
-        }
-
-        /// <summary>
-        /// Checks whether the given menu screen is active or not.
-        /// </summary>
-        /// <returns>
-        /// A boolean representing the state of the given menu.
-        /// </returns>
-        public bool TargetMenuActive(MenuScreen targetMenu)
-        {
-            CheckForActiveInstance();
-            return _objectManager.TargetMenuActive(ToInternal(targetMenu));
         }
 
         /// <summary>
@@ -183,12 +175,18 @@ namespace LMUI
         public GameObject DuplicateAndClearLayoutFromMenu(MenuScreen targetMenu, string newLayoutName)
         {
             CheckForActiveInstance();
-            return _objectManager.DuplicateAndClearLayoutFromMenu(ToInternal(targetMenu), newLayoutName);
+            return _layoutManager.DuplicateAndClearLayoutFromMenu(ToInternal(targetMenu), newLayoutName);
         }
+        /// <summary>
+        /// Duplicates the layout GameObject from a menu and removes all children.
+        /// </summary>
+        /// <returns>
+        /// A menu layout GameObject with children removed.
+        /// </returns>
         public GameObject DuplicateAndClearLayoutFromMenu(GameObject targetLayout, string newLayoutName)
         {
             CheckForActiveInstance();
-            return _objectManager.DuplicateAndClearLayoutFromMenu(targetLayout, newLayoutName);
+            return _layoutManager.DuplicateAndClearLayoutFromMenu(targetLayout, newLayoutName);
         }
 
         /// <summary>
@@ -302,7 +300,7 @@ namespace LMUI
         /// <returns>
         /// A boolean of whether or not the given menu exists.
         /// </returns>
-        internal bool GameMenuExists(MenuScreen targetMenu)
+        public bool GameMenuExists(MenuScreen targetMenu)
         {
             CheckForActiveInstance();
             return _menuManager.GameMenuExists(ToInternal(targetMenu));
@@ -341,7 +339,7 @@ namespace LMUI
         /// <summary>
         /// Creates the default asset bundle folder if it doesn't already exist.
         /// </summary>
-        public void CreateDefault()
+        public void CreateDefaultAssetBundleFolder()
         {
             CheckForActiveInstance();
             _assetBundlesFolder.CreateDefault();
@@ -350,7 +348,7 @@ namespace LMUI
         /// <summary>
         /// Creates a folder at the specified path.
         /// </summary>
-        public void CreateCustom(string assetBundleFolderPath)
+        public void CreateCustomAssetBundleFolder(string assetBundleFolderPath)
         {
             CheckForActiveInstance();
             _assetBundlesFolder.CreateCustom(assetBundleFolderPath);
